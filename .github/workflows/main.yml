@@ -1,0 +1,50 @@
+# 检测代码能否正常编译
+
+name: Build
+
+on:
+  schedule:
+    # 这里是utc时间
+    - cron:  '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  check_new_release:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # fetch all data to include all tags
+      - id: set-matrix
+        run: echo $(python version.py) >> $GITHUB_OUTPUT
+
+  build:
+    needs: check_new_release
+    if: ${{ needs.check_new_release.outputs.matrix != '' && toJson(fromJson(needs.check_new_release.outputs.matrix)) != '[]' }}
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        VERSION: ${{ fromJSON(needs.check_new_release.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download Build Dependency
+        run: pip install gitpython
+
+      - name: Build
+        run: python main.py ${{ matrix.VERSION }}
+
+      - name: Build archive
+        run: 7z a -t7z -mx=9 pico-toolchain-${{ matrix.VERSION }}.7z pico-toolchain-${{ matrix.VERSION }}
+
+      - name: Upload Release
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          # github的release必须和一个tag关联，同时设置tag和commit后，这个release-action可以自动创建一个tag来包含release
+          tag: ${{ matrix.VERSION }}
+          # commit指向一个分支或者commit id
+          commit: master
+          artifacts: pico-toolchain-{{ matrix.VERSION }}.7z
+          body: pico-toolchain-${{ matrix.VERSION }}
