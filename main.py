@@ -10,16 +10,16 @@ pico_url = fr"https://github.com/raspberrypi/pico-setup-windows/releases/downloa
 
 def copy_file_or_folder(source, destination):
     try:
-        if os.path.isfile(source):  # 复制单个文件
-            shutil.copy2(source, destination)  # 使用 copy2 以保留文件元数据
-            print(f"文件 '{source}' 已成功复制到 '{destination}'")
-        elif os.path.isdir(source):  # 复制整个文件夹
+        if os.path.isfile(source):
+            shutil.copy2(source, destination)
+            print(f"copy '{source}' to '{destination}'")
+        elif os.path.isdir(source):
             shutil.copytree(source, destination)
-            print(f"文件夹 '{source}' 已成功复制到 '{destination}'")
+            print(f"copy '{source}' to '{destination}'")
         else:
-            print("源路径既不是文件也不是文件夹")
+            print("Unknown file")
     except Exception as e:
-        print(f"复制过程中出现错误: {e}")
+        print(f"error: {e}")
 
 
 def copy(source_folder, target_folder, file_name):
@@ -28,11 +28,10 @@ def copy(source_folder, target_folder, file_name):
 
     try:
         copy_file_or_folder(source_path, target_path)
-        print(f"文件 '{file_name}' 已成功从 '{source_folder}' 复制到 '{target_folder}'")
     except FileNotFoundError:
-        print(f"未找到文件 '{file_name}' 在 '{source_folder}' 中")
+        print(f"file not found '{file_name}' in '{source_folder}'")
     except Exception as e:
-        print(f"复制过程中出现错误: {e}")
+        print(f"error: {e}")
 
 
 def download_and_extract(url, extract_path):
@@ -68,7 +67,6 @@ download_and_extract(pico_url, build_dir)
 os.mkdir(toolchain_dir)
 for file in file_list:
     copy(build_dir, toolchain_dir, file)
-
 
 # 在每次打开bat时候，自动生成这个ini
 fix_bat = fr'''@echo off
