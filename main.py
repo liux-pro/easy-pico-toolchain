@@ -76,11 +76,15 @@ set PICO_SDK_VERSION={version[1:]}
 set PICO_INSTALL_PATH=%~dp0
 set PICO_REG_KEY=Software\Raspberry Pi\Pico SDK v%PICO_SDK_VERSION%
 
+if "%PICO_INSTALL_PATH:~-1%"=="\" (
+    set "PICO_INSTALL_PATH=%PICO_INSTALL_PATH:~0,-1%"
+)
+
 :: generate version.ini
-echo [pico-setup-windows]> version.ini
-echo PICO_SDK_VERSION=%PICO_SDK_VERSION%>> version.ini
-echo PICO_INSTALL_PATH=%PICO_INSTALL_PATH%>> version.ini
-echo PICO_REG_KEY=%PICO_REG_KEY%>> version.ini
+echo [pico-setup-windows]> %~dp0version.ini
+echo PICO_SDK_VERSION=%PICO_SDK_VERSION%>> %~dp0version.ini
+echo PICO_INSTALL_PATH=%PICO_INSTALL_PATH%>> %~dp0version.ini
+echo PICO_REG_KEY=%PICO_REG_KEY%>> %~dp0version.ini
 
 echo version.ini generated
 endlocal
