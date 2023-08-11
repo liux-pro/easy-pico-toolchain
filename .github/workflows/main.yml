@@ -46,5 +46,5 @@ jobs:
           tag: ${{ matrix.VERSION }}
           # commit指向一个分支或者commit id
           commit: master
-          artifacts: pico-toolchain-{{ matrix.VERSION }}.7z
+          artifacts: pico-toolchain-${{ matrix.VERSION }}.7z
           body: pico-toolchain-${{ matrix.VERSION }}
